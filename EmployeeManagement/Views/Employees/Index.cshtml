@@ -1,0 +1,290 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@model IPagedList<EmployeeManagement.ViewModels.EmployeeListVM>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@Html.PagedListPager(Model, page => Url.Action("Index", "Employees",
+    new { sortField = Request.QueryString["sortField"], pageNumber = page, searchValue = Request.QueryString["searchValue"] }),
+    new PagedListRenderOptions()
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayPageCountAndCurrentLocation = true,
+        LinkToLastPageFormat = "Last",
+        LinkToFirstPageFormat = "First",
+        LinkToNextPageFormat = "Next",
+        LinkToPreviousPageFormat = "Previous",
+        UlElementClasses = new List<string>() { "paging" }
+    })
+@*<form action="/Employees/Index" method="get">
+        <input type="text" name="searchValue" value="@Request.QueryString["searchValue"]" />
+        <input type="submit" value="search"/>
+    </form>*@
+
+@using (Html.BeginForm("Index", "Employees", FormMethod.Get))
+{
+    @Html.TextBox("searchValue", string.Empty, new { id = "txtSearchValue" })
+    @Html.Hidden("sortField")
+    <input type="submit" value="search" />
+    <input type="button" value="delete" id="btnDeleteMany" />
+}
+<br />
+<p>Current Employees: @ViewBag.CurrentEmployees</p>
+<table class="table" border="1" id="table1">
+    <thead>
+        <tr>
+            <th>
+                <input type="checkbox" id="chkAll" />
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().FullName).ToString(), "Index", "Employees",
+           new { sortField = ViewBag.SortByName, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().Gender).ToString(), "Index", "Employees", new { sortField = ViewBag.SortByGender, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().DateOfBirth).ToString(), "Index", "Employees", new { sortField = ViewBag.SortByBirthdate, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().IsMarried).ToString(), "Index", "Employees", new { sortField = ViewBag.SortByMarriedStatus, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().Email).ToString(), "Index", "Employees", new { sortField = ViewBag.SortByEmail, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().Salary).ToString(), "Index", "Employees", new { sortField = ViewBag.SortBySalary, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Skills)
+            </th>
+            <th>
+                @*@Html.DisplayNameFor(model => model.Department.Name)*@
+                @Html.ActionLink(Html.DisplayNameFor(model => model.First().DepartmentName).ToString(), "Index", "Employees", new { sortField = ViewBag.SortByDepartment, searchValue = Request.QueryString["searchValue"] }, null)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" value="@item.EmployeeId" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateOfBirth)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MarriedStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Salary)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Exp)
+                </td>
+                <td>
+                    @*@Html.DisplayFor(modelItem => item.Department.Name)*@
+                    @item.DepartmentName
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Employees", new { id = item.EmployeeId }, null) |
+                    @Html.ActionLink("Details", "Details", new { id = item.EmployeeId }) |
+                    @Html.ActionLink(linkText: "Delete (Get)", actionName: "Delete", controllerName: "Employees",
+                    routeValues: new
+                    {
+                        id = item.EmployeeId,
+                        searchValue = Request.QueryString["searchValue"],
+                        sortField = Request.QueryString["sortField"],
+                        pageNumber = Request.QueryString["pageNumber"]
+                    }, htmlAttributes: null)
+                </td>
+                <td>
+                    @*@using (Html.BeginForm("Delete", "Employees", FormMethod.Post))
+                        {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("searchValue", Request.QueryString["searchValue"])
+                        @Html.Hidden("sortField",  Request.QueryString["sortField"])
+                        @Html.Hidden("pageNumber", Request.QueryString["pageNumber"])
+                        @Html.Hidden("id", item.EmployeeId)
+                        <input type="submit" value="Delete" />
+                        }*@
+                    @Html.ActionLink("Delete (Post - Ajax)", null, null, new { href = "#", data_id = item.EmployeeId, @class = "deleteButton" });
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@*<a href="/Employees/Index?pageNumber=1">1</a>
+    <a href="@Url.Action("Index", "Employees", new { pageNumber = 2 })">2</a>
+    @Html.ActionLink("3", "Index", "Employees", new { pageNumber = 3 }, new { @class = "abc", data_test = "test" })*@
+@Html.AntiForgeryToken()
+@section StyleScript {
+    <style>
+        .paging li {
+            list-style-type: none;
+            display: inline-block;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+    </style>
+}
+
+@section JsScript {
+    <script type="text/javascript">
+        var $multiCheckBoxesModule = MyLib.Ui.MultiCheckBoxes({
+            checkboxAllSelector: '#chkAll',
+            checkboxListSelector: '#table1 tbody'
+        })
+
+        $multiCheckBoxesModule.init();
+
+
+    </script>
+
+    <script type="text/javascript">
+        var $table1 = $('#table1');
+        var currentPageCount = @ViewBag.PageCount;
+        var $btnDeleteMany = $('#btnDeleteMany');
+        $btnDeleteMany.on('click', function () {
+            var isDeleted = confirm('Do you want to delete these records?');
+            if (isDeleted) {
+                var sendData = {
+                    deletedList: $multiCheckBoxesModule.getSelectedItemValues(),
+                    __RequestVerificationToken:$('input[name="__RequestVerificationToken"]').val()
+                }
+
+                $.ajax({
+                    url: '/Employees/DeleteMany',
+                    method: 'post',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    dataType: 'json',
+                    data: sendData,
+                    //contentType: 'application/json; charset=UTF-8',
+                    //data: JSON.stringify(sendData),
+                    beforeSend: function (jqXHR, settings) {
+                        console.log('start to send');
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log('success');
+                        if (data) {
+                            var queryString = getQueryString(),
+                                searchValue = queryString['searchValue'] || "",
+                                sortField = queryString['sortField'] || "",
+                                pageNumber = queryString['pageNumber'] || 1;
+
+                            if ($table1.find('tbody tr').length == $multiCheckBoxesModule.getSelectedItemValues().length) {
+                                if (!isNaN(pageNumber) && pageNumber > 1) {
+                                    if (pageNumber == currentPageCount) {
+                                        --pageNumber;
+                                    }
+                                }
+                            }
+                            window.location.href = '/Employees/Index' + '?searchValue=' + searchValue
+                                + '&sortField=' + sortField
+                                + '&pageNumber=' + pageNumber;
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log('error');
+                    },
+                    complete: function (jqXHR, textStatus) {
+                        console.log('complete');
+                    },
+                    statusCode: {
+                        400: function () {
+                            alert('');
+                        },
+                        500: function () {
+
+                        }
+                    }
+                })
+            }
+        });
+
+
+    </script>
+    <script type="text/javascript">
+        $table1.find('tbody').on('click', '.deleteButton', function (event) {
+            var $thisDeleteButton = $(this);
+
+            var isDeleted = confirm('Do you want to delete these records?');
+            if (isDeleted) {
+                var sendData = {
+                    deletedList: $thisDeleteButton.attr('data-id'),
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                }
+
+                $.ajax({
+                    url: '/Employees/DeleteMany',
+                    method: 'post',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    dataType: 'json',
+                    data: sendData,
+                    //contentType: 'application/json; charset=UTF-8',
+                    //data: JSON.stringify(sendData),
+                    beforeSend: function (jqXHR, settings) {
+                        console.log('start to send');
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log('success');
+                        if (data) {
+                            var queryString = getQueryString(),
+                                searchValue = queryString['searchValue'] || "",
+                                sortField = queryString['sortField'] || "",
+                                pageNumber = queryString['pageNumber'] || 1;
+
+                            if ($table1.find('tbody tr').length == 1) {
+                                if (!isNaN(pageNumber) && pageNumber > 1) {
+                                    if (pageNumber == currentPageCount) {
+                                        --pageNumber;
+                                    }
+                                }
+                            }
+
+                            window.location.href = '/Employees/Index' + '?searchValue=' + searchValue
+                                + '&sortField=' + sortField
+                                + '&pageNumber=' + pageNumber;
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log('error');
+                    },
+                    complete: function (jqXHR, textStatus) {
+                        console.log('complete');
+                    },
+                    statusCode: {
+                        400: function () {
+                            alert('');
+                        },
+                        500: function () {
+
+                        }
+                    }
+                })
+            }
+
+            preventDefaultAction(event);
+        })
+    </script>
+}

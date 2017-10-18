@@ -1,0 +1,11 @@
+﻿<h2>Testing2</h2>
+
+@foreach (var item in ViewBag.jobs)
+{
+    <p style="color:red">@item</p>
+}
+
+@foreach (var item in (List<string>) ViewData["jobs"])
+{
+    <p style="color:red">@item</p>
+}
